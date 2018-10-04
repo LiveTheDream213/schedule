@@ -1,38 +1,63 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import * as actions from "../../actions";
 
-import * as actions from '../../actions';
+import Icon from "../icon";
+import Arrow from "../arrow";
+import Action from "../action";
 
-import LibraryCourse from './libraryCourse';
+class LibraryCourse extends Component {
 
-class Library extends Component {
+  constructor(props) {
+    super(props)
 
-    componentWillMount() {
-        this.props.fetchCourses()
+    this.state = {
+      status: true
     }
+  }
 
-    renderCourses() {
-        const data = this.props.courses
-
-        return data.map((course, index) => {
-            return <LibraryCourse {...course} key={index}/>
-        })
+  renderDescription = function() {
+    if (!this.state.status) {
+      return (
+        <div className="library-course__description">
+          <label>Course Description</label>
+          <p>{this.props.description}</p>
+        </div>
+      )
     }
+  }.bind(this);
 
-    render() {
-        return (
-            <div className="library">
-                <h1 className="library__title">Course Library</h1>
-                { this.renderCourses() }
-            </div>
-        )
+  handleCallback = function(status) {
+    if(!status) {
+      document.getElementById('library-course').classList.add('library-course-selected');
+    } else {
+      document.getElementById('library-course').classList.remove('library-course-selected');
     }
+    this.setState({ status })
+  }.bind(this)
+
+  render() {
+    return (
+      <div id="library-course" className="library-course">
+        <div className="library-course__title-check">
+          <label className="library-course__title">{this.props.title}</label>
+          {Icon("fas fa-check", "library-course__icon")}
+        </div>
+        <div className="library-course__line" />
+        <Arrow
+          callback={status => this.handleCallback(status)}
+          id={this.props.id}
+          className="library-course__arrow"
+        />
+        <Action
+          id={this.props.id}
+          onClick={() => this.props.toggleEnrolled(this.props.id)}
+          className="library-course__action"
+        />
+        {this.renderDescription()}
+      </div>
+    );
+  }
 }
 
-function mapStateToProps(state) {
-    return {
-        courses: state.courses
-    }
-}
-
-export default connect(mapStateToProps, actions)(Library);
+export default connect(null, actions)(LibraryCourse);
